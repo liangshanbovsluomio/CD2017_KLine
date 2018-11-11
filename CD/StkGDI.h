@@ -14,7 +14,7 @@ public:
 	bool ShowCur;
 public:
 	StkGDI(void);
-	void DrawKLine(IntPtr ptr,cli::array<QuoteRef^>^ quotes,cli::array<IndexRef^>^ mainIndexs,cli::array<SecondMapRef^>^ secondMapRefs,String^ savefile);
+	System::String^ DrawKLine(IntPtr ptr,cli::array<QuoteRef^>^ quotes,cli::array<IndexRef^>^ mainIndexs,cli::array<SecondMapRef^>^ secondMapRefs,String^ savefile);
 };
 }
 

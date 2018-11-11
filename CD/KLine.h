@@ -29,15 +29,15 @@ public:
 public:
 	KLine(void);
 	~KLine();
-	void DrawKLine(HWND hwnd,const char* savefile);
+	System::String^ DrawKLine(HWND hwnd,const char* savefile);
 private:
 	void InitDraw(const RECT& rect);
 	void DrawPriceScral(HWND hwnd,double _pr);
 	void DrawPriceScral(CDC& cdc,double _pr);
 	CPoint GetPoint(double _pr,int _index);
 	vector<CDateTime> GetTimeSpan(vector<Quote> quotes);
-	void DrawKLineSharp(HWND hwnd,Quote quote,int _index);
-	void DrawKLineSharp(CDC& cdc,Quote quote,int _index);
+	bool DrawKLineSharp(HWND hwnd,Quote quote,int _index);
+	bool DrawKLineSharp(CDC& cdc,Quote quote,int _index);
 	void DrawQX(CDC& cdc,vector<CPoint> values,COLORREF color,int maxY);
 	void DrawStike(CDC& cdc,vector<CPoint> values,COLORREF color,vector<COLORREF> colors,int y);
 	void DrawBar(CDC& cdc,vector<CPoint> values,COLORREF color,vector<COLORREF> colors,int y);

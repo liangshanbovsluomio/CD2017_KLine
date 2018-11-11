@@ -14,10 +14,10 @@ CD::StkGDI::StkGDI(void)
 	ShowCur=false;
 }
 
-void CD::StkGDI::DrawKLine(IntPtr ptr,cli::array<QuoteRef^>^ quotes, cli::array<IndexRef^>^ mainIndexs,cli::array<SecondMapRef^>^ secondMapRefs,String^ savefile)
+System::String^ CD::StkGDI::DrawKLine(IntPtr ptr,cli::array<QuoteRef^>^ quotes, cli::array<IndexRef^>^ mainIndexs,cli::array<SecondMapRef^>^ secondMapRefs,String^ savefile)
 {
 	if(quotes->Length==0)
-		return;
+		return System::String::Empty;
 
 	KLine kl;
 	kl.kLineWidth=kLineWidth;
@@ -80,5 +80,5 @@ void CD::StkGDI::DrawKLine(IntPtr ptr,cli::array<QuoteRef^>^ quotes, cli::array<
 	}
 
 	kl.Quotes=klQuotes;
-	kl.DrawKLine(reinterpret_cast<HWND>(ptr.ToPointer()),(char*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(savefile).ToPointer());
+	return kl.DrawKLine(reinterpret_cast<HWND>(ptr.ToPointer()),(char*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(savefile).ToPointer());
 }

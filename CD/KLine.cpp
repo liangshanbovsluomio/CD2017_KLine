@@ -163,19 +163,19 @@ void KLine::InitDraw(const RECT& rect)
 	ShowCur=ShowCur&&(PointY<picHt||(PointY<stageH-picHOY &&(PointY-picHt)%(picHt/2)>picHOY));
 }
 
-void KLine::DrawKLine(HWND hwnd,const char* savefile){
+System::String^ KLine::DrawKLine(HWND hwnd,const char* savefile){
     RECT rect;
 	bool boo= GetClientRect(hwnd,&rect);
 	
 	if(!boo)
-		return;
+		return System::String::Empty;
 
 	InitDraw(rect);
 	if(strlen(savefile)>0)
 	   PointX=this->picWh-1;
 
 	if(this->picHt<5 ||this->picWh<5)
-		return;
+		return System::String::Empty;
 
 	PAINTSTRUCT paintParm;
 	paintParm.fErase=0;
@@ -258,9 +258,14 @@ void KLine::DrawKLine(HWND hwnd,const char* savefile){
 
 	//DrawPriceScral(memDC,topPrice);
 	int index=0;
+	System::String^ currdate=System::String::Empty;
 	for(vector<Quote>::iterator it=Quotes.begin()+kLineFrom;it!=Quotes.end()&&index<maxKlineNumber;it++)
 	{
-		DrawKLineSharp(memDC,*it,index++);
+		if (DrawKLineSharp(memDC, *it, index++))
+		{
+			
+			currdate =gcnew System::String(it->date.ToString().c_str());
+		}
 	}
 
 	
@@ -365,6 +370,8 @@ void KLine::DrawKLine(HWND hwnd,const char* savefile){
 	memDC.DeleteDC();
 	ReleaseDC(hwnd,hdc);
 	::EndPaint(hwnd,&paintParm);
+
+	return currdate;
 }
 
 void KLine::DrawLine(CDC& cdc,int x,int y,int x2,int y2,COLORREF c,int ps_style)
@@ -572,10 +579,10 @@ vector<CDateTime> KLine::GetTimeSpan(vector<Quote> quotes)
 	return timeSpan;
 }
 
-void KLine::DrawKLineSharp(CDC& cdc,Quote quote,int _index)
+bool KLine::DrawKLineSharp(CDC& cdc,Quote quote,int _index)
 {
 	if(quote.hp==0||quote.lp==0||quote.op==0)
-		return;
+		return false;
 	CPen *oldPen=NULL;
 
 	CPoint pt_open=GetPoint(quote.op,_index);
@@ -617,9 +624,12 @@ void KLine::DrawKLineSharp(CDC& cdc,Quote quote,int _index)
 	cdc.LineTo(pt_h.x,quote.ep<quote.op?pt_close.y:pt_open.y);
 
 	cdc.SelectObject(oldPen);
+
+	return this->PointX >= rect.left&&this->PointX <= rect.right
+		&&this->PointY >= pt_h.y&&this->PointY <= pt_l.y;
 }
 
-void KLine::DrawKLineSharp(HWND hwnd,Quote quote,int _index)
+bool KLine::DrawKLineSharp(HWND hwnd,Quote quote,int _index)
 {
 	CPen *oldPen=NULL;
 
@@ -634,7 +644,6 @@ void KLine::DrawKLineSharp(HWND hwnd,Quote quote,int _index)
 		oldPen=pDC->SelectObject(&penUP);
 	}
 
-	
 	RECT rect={pt_open.x,quote.ep>quote.op?pt_close.y:pt_open.y,pt_open.x+kLineWidth,::abs(pt_open.y-pt_close.y)+(quote.ep>quote.op?pt_close.y:pt_open.y)};
 	if(rect.top==rect.bottom)
 	{
@@ -662,6 +671,9 @@ void KLine::DrawKLineSharp(HWND hwnd,Quote quote,int _index)
 
 	pDC->SelectObject(oldPen);
 	//ReleaseDC(hwnd,hdc);
+
+	return this->PointX >= rect.left&&this->PointX <= rect.right
+		&&this->PointY >= pt_h.y&&this->PointY <= pt_l.y;
 }
 
 Quote KLine::GetKLineQuoteByPoint(int pointX)
