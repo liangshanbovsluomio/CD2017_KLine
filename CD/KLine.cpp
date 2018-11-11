@@ -698,15 +698,17 @@ void KLine::DrawSecondIndex(CDC& cdc,SecondMap&  secondMap,int index)
 	DrawLine(cdc,0,picHt+index*picHt/2,this->stageW,picHt+picHt*index/2,RGB(255,0,0));
 	int textPos=2;
 	double max=0,min=MAXDOUBLE;
-	for(vector<CIndex>::iterator it=secondMap.indexs.begin();it!=secondMap.indexs.end();it++)
-	{
-		for(int i=kLineFrom;i<it->values.size();i++)
+	for (vector<vector<CIndex>>::iterator it0 = secondMap.indexs.begin(); it0 != secondMap.indexs.end(); it0++) {
+		for (vector<CIndex>::iterator it = it0->begin(); it != it0->end(); it++)
 		{
-			if(it->values[i]>max)
-				max=it->values[i];
+			for (int i = kLineFrom; i < it->values.size(); i++)
+			{
+				if (it->values[i] > max)
+					max = it->values[i];
 
-			if(it->values[i]<min)
-				min=it->values[i];
+				if (it->values[i] < min)
+					min = it->values[i];
+			}
 		}
 	}
 
@@ -760,39 +762,44 @@ void KLine::DrawSecondIndex(CDC& cdc,SecondMap&  secondMap,int index)
 	}
 	//DrawLine(cdc,picWh,picHt+picLOX+picHt*index/2,picWh,picHt+picHt*(index+1)/2,RGB(255,0,0));
 	
-	for(vector<CIndex>::iterator it=secondMap.indexs.begin();it!=secondMap.indexs.end();it++)
-	{
-		if(it->values.size()<kLineFrom ||it->values.size()!=this->Quotes.size())
-			continue;
+	for (vector<vector<CIndex>>::iterator it0 = secondMap.indexs.begin(); it0 != secondMap.indexs.end(); it0++) {
+		for (vector<CIndex>::iterator it = it0->begin(); it != it0->end(); it++)
+		{
+			if (it->values.size() < kLineFrom || it->values.size() != this->Quotes.size())
+				continue;
 
-		int pointIndex=PointX/(kLineWidth+kLineSpace)+kLineFrom;
-		if(pointIndex<it->values.size()&&pointIndex>=0)
-		{
-			textPos+= DrawText(cdc,textPos,picHt+picHt*index/2+5,it->IndexName+":"+NumberHelper::ToString(it->values.at(pointIndex)),it->color)+10;
-		}
-		
+			int pointIndex = PointX / (kLineWidth + kLineSpace) + kLineFrom;
+			if (pointIndex < it->values.size() && pointIndex >= 0)
+			{
+				textPos += DrawText(cdc, textPos, picHt + picHt*index / 2 + 5, it->IndexName + ":" + NumberHelper::ToString(it->values.at(pointIndex)), it->color) + 10;
+			}
+			else {
+				textPos += DrawText(cdc, textPos, picHt + picHt*index / 2 + 5, it->IndexName + ":" + NumberHelper::ToString(it->values.at(it->values.size() - 1)), it->color) + 10;
+			}
 
-		vector<CPoint> pts;
-		for(int i=kLineFrom;i<it->values.size();i++)
-		{
-			int y=picHt+picHt*index/2+picHOY+(picHt/2-picHOY)*(top-it->values.at(i))/(top-bot);
-			CPoint pt((i-kLineFrom)*(kLineWidth+kLineSpace)+kLineWidth/2,y);
-			pts.push_back(pt);
-		}
 
-		if(it->DrawType==0)
-		{
-		   DrawQX(cdc,pts,it->color,picHt+picHt*(index+1)/2);
-		}
-		else if(it->DrawType==1)
-		{
-			DrawStike(cdc,pts,it->color,it->colors,min(y0,picHt+picHt*index/2+picHOY+(picHt/2-picHOY)));
-		}
-		else if(it->DrawType==2)
-		{
-			DrawBar(cdc,pts,it->color,it->colors,min(y0,picHt+picHt*index/2+picHOY+(picHt/2-picHOY)));
-		}
+			vector<CPoint> pts;
+			for (int i = kLineFrom; i < it->values.size(); i++)
+			{
+				int y = picHt + picHt*index / 2 + picHOY + (picHt / 2 - picHOY)*(top - it->values.at(i)) / (top - bot);
+				CPoint pt((i - kLineFrom)*(kLineWidth + kLineSpace) + kLineWidth / 2, y);
+				pts.push_back(pt);
+			}
 
+			if (it->DrawType == 0)
+			{
+				DrawQX(cdc, pts, it->color, picHt + picHt*(index + 1) / 2);
+			}
+			else if (it->DrawType == 1)
+			{
+				DrawStike(cdc, pts, it->color, it->colors, min(y0, picHt + picHt*index / 2 + picHOY + (picHt / 2 - picHOY)));
+			}
+			else if (it->DrawType == 2)
+			{
+				DrawBar(cdc, pts, it->color, it->colors, min(y0, picHt + picHt*index / 2 + picHOY + (picHt / 2 - picHOY)));
+			}
+
+		}
 	}
 
 	//»­Ê®×Ö¹â±ê

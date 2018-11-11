@@ -14,7 +14,7 @@ CD::StkGDI::StkGDI(void)
 	ShowCur=false;
 }
 
-void CD::StkGDI::DrawKLine(IntPtr ptr,cli::array<QuoteRef^>^ quotes, cli::array<IndexRef^>^ mainIndexs, cli::array<SecondMapRef^>^ secondMapRefs,String^ savefile)
+void CD::StkGDI::DrawKLine(IntPtr ptr,cli::array<QuoteRef^>^ quotes, cli::array<IndexRef^>^ mainIndexs,cli::array<SecondMapRef^>^ secondMapRefs,String^ savefile)
 {
 	if(quotes->Length==0)
 		return;
@@ -48,26 +48,33 @@ void CD::StkGDI::DrawKLine(IntPtr ptr,cli::array<QuoteRef^>^ quotes, cli::array<
 
 	for(int i=0;i<secondMapRefs->Length;i++)
 	{
+		SecondMapRef^ arr0 = secondMapRefs[i];
 		SecondMap secMap;
-		for(int j=0;j<secondMapRefs[i]->IndexRefs->Length;j++)
+		for (int j = 0; j < arr0->IndexRefs->Length; j++)
 		{
-			CIndex cindex;
-			cindex.color=RGB(secondMapRefs[i]->IndexRefs[j]->color->R,secondMapRefs[i]->IndexRefs[j]->color->G,secondMapRefs[i]->IndexRefs[j]->color->B);
-			cindex.IndexName=(char*)Marshal::StringToCoTaskMemAnsi(secondMapRefs[i]->IndexRefs[j]->Indexname).ToPointer();
-			cindex.DrawType=secondMapRefs[i]->IndexRefs[j]->DrawType;
-			bool colors=secondMapRefs[i]->IndexRefs[j]->colors->Length==secondMapRefs[i]->IndexRefs[j]->values->Length;
+			cli::array<IndexRef^>^ arr1= arr0->IndexRefs[j];
+			vector<CIndex> vcindex;
+			for (int m = 0; m < arr1->Length; m++) {
+				IndexRef^ arr2 = arr1[m];
+				CIndex cindex;
+				cindex.color = RGB(arr2->color->R, arr2->color->G, arr2->color->B);
+				cindex.IndexName = (char*)Marshal::StringToCoTaskMemAnsi(arr2->Indexname).ToPointer();
+				cindex.DrawType = arr2->DrawType;
+				bool colors = arr2->colors->Length == arr2->values->Length;
 
-			for(int z=0;z<secondMapRefs[i]->IndexRefs[j]->values->Length;z++)
-			{
-				if(colors)
+				for (int z = 0; z < arr2->values->Length; z++)
 				{
-					ColorRef^ colRef= secondMapRefs[i]->IndexRefs[j]->colors[z];
-					cindex.colors.push_back(RGB(colRef->R,colRef->G,colRef->B));
+					if (colors)
+					{
+						ColorRef^ colRef = arr2->colors[z];
+						cindex.colors.push_back(RGB(colRef->R, colRef->G, colRef->B));
+					}
+					double db = arr2->values[z];
+					cindex.values.push_back(db);
 				}
-				double db=secondMapRefs[i]->IndexRefs[j]->values[z];
-				cindex.values.push_back(db);
+				vcindex.push_back(cindex);
 			}
-			secMap.indexs.push_back(cindex);
+			secMap.indexs.push_back(vcindex);
 		}
 		kl.SecIndexs.push_back(secMap);
 	}

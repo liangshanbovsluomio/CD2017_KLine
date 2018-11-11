@@ -4,7 +4,7 @@
 class SecondMap
 {
 public:
-	vector<CIndex> indexs;
+	vector<vector<CIndex>> indexs;
 public:
 	SecondMap(void);
 	virtual ~SecondMap(void);

@@ -3,7 +3,7 @@
 public ref class SecondMapRef
 {
 public:
-	cli::array<IndexRef^>^ IndexRefs;
+	cli::array<cli::array<IndexRef^>^>^ IndexRefs;
 public:
 	SecondMapRef(void);
 };
